@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dojo Miyazato | Sistema Completo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --negro: #0a0a0a;
+            --rojo: #bc002d;
+            --blanco: #f4f4f4;
+            --gris-oscuro: #1a1a1a;
+            --admin-gold: #d4af37;
+            --transicion: all 0.3s ease;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Roboto', sans-serif; background-color: var(--negro); color: var(--blanco); line-height: 1.6; }
+        h1, h2, h3 { font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: 2px; }
+        ul { list-style: none; }
+        a { text-decoration: none; color: inherit; }
+
+        /* --- NAVEGACIÓN --- */
+        header {
+            background-color: rgba(10, 10, 10, 0.98);
+            padding: 1rem 5%;
+            position: fixed; width: 100%; top: 0; z-index: 1000;
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 2px solid var(--rojo);
+        }
+        .logo { font-size: 1.6rem; font-weight: bold; }
+        .logo span { color: var(--rojo); }
+
+        .nav-wrapper { display: flex; align-items: center; gap: 20px; }
+        nav ul { display: flex; gap: 20px; }
+        nav ul li a:hover { color: var(--rojo); cursor: pointer; }
+
+        .btn-nav { background: transparent; border: 1px solid white; color: white; padding: 6px 12px; cursor: pointer; font-size: 0.8rem; }
+        .btn-nav.red { background: var(--rojo); border-color: var(--rojo); }
+        .btn-nav.user-btn { border-color: var(--admin-gold); color: var(--admin-gold); }
+
+        /* --- SECCIONES ORIGINALES --- */
+        section { padding: 100px 8% 60px; }
+        .section-title { text-align: center; font-size: 2.8rem; margin-bottom: 3rem; position: relative; }
+        .section-title::after { content: ''; width: 60px; height: 4px; background: var(--rojo); position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%); }
+
+        #inicio {
+            height: 100vh;
+            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1555597673-b21d5c935865?auto=format&fit=crop&w=1350&q=80');
+            background-size: cover; background-position: center;
+            display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;
+        }
+
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 50px; align-items: center; }
+        .info-img { width: 100%; border: 10px solid var(--gris-oscuro); }
+
+        /* Entrenamiento (Botones restaurados) */
+        .classes-container { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+        .class-box { padding: 40px; background: #111; border-left: 5px solid var(--rojo); display: flex; flex-direction: column; justify-content: space-between; }
+        .online-tag { color: #00d4ff; font-weight: bold; }
+        .presencial-tag { color: var(--rojo); font-weight: bold; }
+        .btn-class { margin-top: 20px; padding: 12px; font-weight: bold; text-align: center; cursor: pointer; border: none; }
+        .btn-presencial { background: var(--rojo); color: white; }
+        .btn-online { background: #0088cc; color: white; }
+
+        /* --- TIENDA --- */
+        #admin-add-box { display: none; background: #1a1a1a; padding: 25px; border: 2px dashed var(--admin-gold); margin-bottom: 30px; border-radius: 8px; }
+        .grid-tienda { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; }
+        .product-card { background: var(--gris-oscuro); padding: 20px; text-align: center; position: relative; border-bottom: 4px solid transparent; }
+        .product-card img { width: 100%; height: 220px; object-fit: contain; background: white; margin-bottom: 15px; border-radius: 5px; }
+        .admin-tools { display: none; margin-top: 15px; gap: 10px; justify-content: center; border-top: 1px solid #333; padding-top: 10px; }
+        .btn-edit { background: var(--admin-gold); color: black; border: none; padding: 5px 10px; cursor: pointer; font-weight: bold; }
+        .btn-delete { background: #800; color: white; border: none; padding: 5px 10px; cursor: pointer; font-weight: bold; }
+
+        /* --- MODALES Y PERFIL --- */
+        .modal { display: none; position: fixed; z-index: 3000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); }
+        .modal-content { background: var(--gris-oscuro); margin: 5% auto; padding: 40px; width: 90%; max-width: 500px; border: 1px solid var(--rojo); position: relative; }
+        .close { position: absolute; right: 20px; top: 10px; font-size: 2rem; cursor: pointer; }
+        input { width: 100%; padding: 12px; margin: 10px 0; background: #222; border: 1px solid #444; color: white; }
+        .legal-box { background: #000; padding: 15px; margin: 10px 0; font-size: 0.8rem; height: 100px; overflow-y: scroll; color: #aaa; border: 1px solid #333; }
+
+        /* --- CARRITO --- */
+        #cart-panel {
+            position: fixed; right: -450px; top: 0; width: 420px; height: 100%;
+            background: var(--gris-oscuro); z-index: 2500; padding: 30px; transition: 0.5s;
+            box-shadow: -10px 0 30px rgba(0,0,0,0.8); display: flex; flex-direction: column;
+        }
+        #cart-panel.active { right: 0; }
+        #cart-items { flex-grow: 1; overflow-y: auto; margin: 20px 0; }
+        .cart-item { padding: 15px 0; border-bottom: 1px solid #333; }
+        .subtotal-item { color: var(--rojo); font-weight: bold; }
+
+        .btn-main { background: var(--rojo); color: white; border: none; padding: 12px 25px; cursor: pointer; font-weight: bold; transition: var(--transicion); width: 100%; }
+        .btn-main:hover { background: white; color: var(--negro); }
+
+        footer { text-align: center; padding: 60px; background: #000; border-top: 1px solid #222; }
+
+        @media (max-width: 850px) {
+            .info-grid, .classes-container { grid-template-columns: 1fr; }
+            nav { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">DOJO <span>MIYAZATO</span></div>
+        <div class="nav-wrapper">
+            <nav>
+                <ul>
+                    <li><a href="#inicio">Inicio</a></li>
+                    <li><a href="#info">El Dojo</a></li>
+                    <li><a href="#clases">Clases</a></li>
+                    <li><a href="#tienda">Tienda</a></li>
+                </ul>
+            </nav>
+            <div id="guest-zone">
+                <button class="btn-nav" onclick="openModal('loginModal')">LOGIN</button>
+                <button class="btn-nav red" onclick="openModal('regModal')">REGISTRO</button>
+            </div>
+            <div id="user-zone" style="display: none;">
+                <button class="btn-nav user-btn" onclick="openModal('perfilModal')">MIS DATOS</button>
+            </div>
+            <div onclick="toggleCart()" style="cursor:pointer; background: var(--rojo); padding: 5px 12px; border-radius: 4px;">
+                🛒 (<span id="cart-count">0</span>)
+            </div>
+        </div>
+    </header>
+
+    <section id="inicio">
+        <h1 style="font-size: 4rem;">Bienvenido a Miyazato Dojo</h1>
+        <p style="font-size: 1.2rem; max-width: 800px;">Miyazato Dojo es sinónimo de tradición marcial. Heredera de siglos de evolución en el arte del Karate-Do ofrece, desde hace cincuenta y cinco años en Argentina, un método seguro y eficaz para iniciarse y avanzar en el estudio y práctica de este arte marcial.</p>
+        <a href="#clases" class="btn-main" style="margin-top:20px; width: auto;">EMPEZAR A ENTRENAR</a>
+    </section>
+
+    <section id="info">
+        <h2 class="section-title">Nuestra Historia</h2>
+        <div class="info-grid">
+            <div>
+                <p>Nuestra historia, nuestro presente y nuestras proyecciones están ancladas en los valores del respeto, la honradez, la razón sobre la fuerza, el esfuerzo y la verdad. Por esto es que el presente Informe pone de manifiesto el trabajo realizado por el equipo de la Escuela Miyazato no sólo en los espacios de práctica del Karate Do y en cada uno de los Dojos, sino también en la puesta en valor de nuestras prácticas en clave de sustentabilidad..</p>
+              
+            </div>
+            <img src="https://images.unsplash.com/photo-1552072092-7f9b8d63efcb?auto=format&fit=crop&w=800&q=80" class="info-img">
+        </div>
+    </section>
+
+    <section id="inicio">
+        <p style="font-size: 1.2rem; max-width: 800px;">Desde los primeros pasos de Sensei Shoei Miyazato junto a la Escuela Miyazato, siempre fue su objetivo principal el fomentar valores escenciales para entregar a la sociedad ciudadamos ejemplares. Este objetivo es ahora impulsado por Sensei Masatoshi Miyazato, y es un claro compromiso con el desarrollo sustentable de la Escuela. Prueba de ello, es la certificación obtenida por la Escuela Miyazato de manos de una entidad tan prestigiosa en materia de sustentabilidad como lo es el GRI (Global Reporting Initiative), transformándose en la primera institución de su tipo en el mundo en obtener dicha distinción.</p>
+    </section>
+
+    <section id="clases" style="background-color: var(--gris-oscuro);">
+        <h2 class="section-title">Entrenamiento</h2>
+        <div class="classes-container">
+            <div class="class-box">
+                <div>
+                    <span class="presencial-tag">PRESENCIAL</span>
+                    <h3>Karate Tradicional</h3>
+                    <p>Práctica en el Hombu Dojo. Niveles desde principiantes hasta Danes.</p>
+                    <p style="margin-top:10px;"><strong>Lunes a Viernes 18:00 - 21:00 hs.</strong></p>
+                </div>
+                <button class="btn-class btn-presencial" onclick="window.location.href='#info'">VER UBICACIÓN E INFO</button>
+            </div>
+            <div class="class-box">
+                <div>
+                    <span class="online-tag">ONLINE</span>
+                    <h3>Dojo Virtual</h3>
+                    <p>Seminarios técnicos y clases en vivo para alumnos de todo el mundo.</p>
+                    <p style="margin-top:10px;"><strong>Vía Zoom y Plataforma propia.</strong></p>
+                </div>
+                <button class="btn-class btn-online" onclick="alert('Redirigiendo al formulario de inscripción...')">INSCRIBIRSE ONLINE</button>
+            </div>
+        </div>
+    </section>
+
+    <section id="tienda">
+        <h2 class="section-title">Tienda Oficial</h2>
+        
+        <div id="admin-add-box">
+            <h3 style="color: var(--admin-gold); margin-bottom: 15px;">GESTIÓN ADMIN: AGREGAR PRODUCTO</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;">
+                <input type="text" id="add-name" placeholder="Nombre del producto">
+                <input type="number" id="add-price" placeholder="Precio ($)">
+                <input type="text" id="add-img" placeholder="URL de la imagen">
+                <button class="btn-main" style="background: var(--admin-gold); color: black;" onclick="addNewProduct()">GUARDAR PRODUCTO</button>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-bottom: 30px;">
+            <input type="text" id="search-bar" placeholder="Buscar por nombre (coincidencia inteligente)..." onkeyup="searchProducts()" style="width: 400px; max-width: 90%;">
+        </div>
+
+        <div class="grid-tienda" id="product-grid"></div>
+    </section>
+
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('loginModal')">&times;</span>
+            <h2>Iniciar Sesión</h2>
+            <p style="color: var(--admin-gold); font-size: 0.8rem;">Admin: administrador / Pass: admin123</p>
+            <input type="text" id="login-user" placeholder="Nombre de usuario">
+            <input type="password" id="login-pass" placeholder="Contraseña">
+            <button class="btn-main" onclick="handleLogin()">INGRESAR</button>
+        </div>
+    </div>
+
+    <div id="perfilModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('perfilModal')">&times;</span>
+            <h2 id="perf-name">Nombre de Usuario</h2>
+            <p id="perf-email">email@ejemplo.com</p>
+            <hr style="margin: 20px 0; opacity: 0.2;">
+            
+            <h3>Términos y Condiciones</h3>
+            <div class="legal-box">
+                Los productos adquiridos en el Dojo Miyazato son para uso personal y deportivo. No se aceptan devoluciones de prendas usadas en el Tatami. La membresía del Dojo es intransferible...
+            </div>
+            
+            <h3>Política de Cookies</h3>
+            <div class="legal-box">
+                Utilizamos cookies de sesión para gestionar tu carrito y tu acceso de administrador. No rastreamos datos de navegación externos...
+            </div>
+
+            <button class="btn-main" style="background: #444; margin-top: 15px;" onclick="handleLogout()">CERRAR SESIÓN</button>
+        </div>
+    </div>
+
+    <div id="cart-panel">
+        <h2 style="border-bottom: 2px solid var(--rojo); padding-bottom: 10px;">MI CARRITO</h2>
+        <div id="cart-items"></div>
+        <div style="padding-top: 20px; border-top: 1px solid #333;">
+            <h3 style="display: flex; justify-content: space-between;">
+                <span>TOTAL:</span>
+                <span id="cart-total">$0.00</span>
+            </h3>
+            <button class="btn-main" style="margin-top: 15px;">FINALIZAR COMPRA</button>
+            <button onclick="toggleCart()" style="background:none; border:none; color:gray; width:100%; margin-top:10px; cursor:pointer;">&larr; Seguir mirando</button>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 DOJO MIYAZATO - TRADICIÓN SHORIN-RYU</p>
+    </footer>
+
+    <script>
+        let products = [
+            { id: 1, name: "Karategui Oficial", price: 85, img: "https://m.media-amazon.com/images/I/51r-H1LhG4L._AC_SL1000_.jpg" },
+            { id: 2, name: "Cinto Negro Seda", price: 25, img: "https://m.media-amazon.com/images/I/61N+Vp0P3SL._AC_SL1200_.jpg" },
+            { id: 3, name: "Guantines Kumite", price: 40, img: "https://m.media-amazon.com/images/I/41K0mP6Yp5L._AC_.jpg" }
+        ];
+
+        let cart = {};
+        let currentUser = null;
+
+        // --- GESTIÓN DE SESIÓN ---
+        function handleLogin() {
+            const u = document.getElementById('login-user').value;
+            const p = document.getElementById('login-pass').value;
+
+            if(u === "administrador" && p === "admin123") {
+                currentUser = { name: "Maestro Administrador", email: "admin@miyazato.com", role: "admin" };
+                document.getElementById('admin-add-box').style.display = 'block';
+            } else if (u && p) {
+                currentUser = { name: u, email: u + "@dojo.com", role: "user" };
+            } else { alert("Datos incompletos"); return; }
+
+            document.getElementById('guest-zone').style.display = 'none';
+            document.getElementById('user-zone').style.display = 'block';
+            document.getElementById('perf-name').innerText = currentUser.name;
+            document.getElementById('perf-email').innerText = currentUser.email;
+            closeModal('loginModal');
+            renderStore();
+        }
+
+        function handleLogout() {
+            currentUser = null;
+            document.getElementById('guest-zone').style.display = 'block';
+            document.getElementById('user-zone').style.display = 'none';
+            document.getElementById('admin-add-box').style.display = 'none';
+            closeModal('perfilModal');
+            renderStore();
+        }
+
+        // --- GESTIÓN TIENDA (CRUD) ---
+        function renderStore(items = products) {
+            const grid = document.getElementById('product-grid');
+            grid.innerHTML = '';
+            items.forEach(p => {
+                grid.innerHTML += `
+                    <div class="product-card">
+                        <img src="${p.img}">
+                        <h3>${p.name}</h3>
+                        <p class="price" style="color:var(--rojo); font-weight:bold; font-size:1.4rem">$${p.price.toFixed(2)}</p>
+                        <button class="btn-main" style="margin-top:10px" onclick="addToCart(${p.id})">COMPRAR</button>
+                        
+                        <div class="admin-tools" style="display: ${currentUser?.role === 'admin' ? 'flex' : 'none'}">
+                            <button class="btn-edit" onclick="editProduct(${p.id})">EDITAR</button>
+                            <button class="btn-delete" onclick="deleteProduct(${p.id})">BORRAR</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function addNewProduct() {
+            const n = document.getElementById('add-name').value;
+            const pr = parseFloat(document.getElementById('add-price').value);
+            const im = document.getElementById('add-img').value;
+            if(n && pr) {
+                products.push({ id: Date.now(), name: n, price: pr, img: im || 'https://via.placeholder.com/200' });
+                renderStore();
+            }
+        }
+
+        function editProduct(id) {
+            const p = products.find(x => x.id === id);
+            const nName = prompt("Nuevo nombre:", p.name);
+            const nPrice = prompt("Nuevo precio:", p.price);
+            const nImg = prompt("Nueva URL imagen:", p.img);
+            if(nName) p.name = nName;
+            if(nPrice) p.price = parseFloat(nPrice);
+            if(nImg) p.img = nImg;
+            renderStore();
+        }
+
+        function deleteProduct(id) {
+            if(confirm("¿Seguro que desea eliminarlo?")) {
+                products = products.filter(x => x.id !== id);
+                renderStore();
+            }
+        }
+
+        // --- BÚSQUEDA INTELIGENTE ---
+        function getLevenshteinDistance(a, b) {
+            const matrix = Array.from({ length: a.length + 1 }, () => []);
+            for (let i = 0; i <= a.length; i++) matrix[i][0] = i;
+            for (let j = 0; j <= b.length; j++) matrix[0][j] = j;
+            for (let i = 1; i <= a.length; i++) {
+                for (let j = 1; j <= b.length; j++) {
+                    const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+                    matrix[i][j] = Math.min(matrix[i - 1][j] + 1, matrix[i][j - 1] + 1, matrix[i - 1][j - 1] + cost);
+                }
+            }
+            return matrix[a.length][b.length];
+        }
+
+        function searchProducts() {
+            const term = document.getElementById('search-bar').value.toLowerCase();
+            if(!term) { renderStore(); return; }
+            const filtered = products.filter(p => {
+                const name = p.name.toLowerCase();
+                if(name.includes(term)) return true;
+                return name.split(" ").some(word => getLevenshteinDistance(term, word) <= (term.length > 4 ? 2 : 1));
+            });
+            renderStore(filtered);
+        }
+
+        // --- CARRITO (ACUMULATIVO) ---
+        function addToCart(id) {
+            if (cart[id]) cart[id].quantity += 1;
+            else { const p = products.find(x => x.id === id); cart[id] = { ...p, quantity: 1 }; }
+            updateCartUI();
+            if(!document.getElementById('cart-panel').classList.contains('active')) toggleCart();
+        }
+
+        function updateCartUI() {
+            const container = document.getElementById('cart-items');
+            container.innerHTML = '';
+            let total = 0, count = 0;
+            Object.values(cart).forEach(item => {
+                const sub = item.price * item.quantity;
+                total += sub; count += item.quantity;
+                container.innerHTML += `
+                    <div class="cart-item">
+                        <div style="display:flex; justify-content:space-between">
+                            <strong>${item.name}</strong>
+                            <button onclick="removeItem(${item.id})" style="background:none; border:none; color:red; cursor:pointer">X</button>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; font-size:0.9rem; color:#aaa">
+                            <span>$${item.price.toFixed(2)} x ${item.quantity}</span>
+                            <span class="subtotal-item">$${sub.toFixed(2)}</span>
+                        </div>
+                    </div>`;
+            });
+            document.getElementById('cart-total').innerText = `$${total.toFixed(2)}`;
+            document.getElementById('cart-count').innerText = count;
+        }
+
+        function removeItem(id) { delete cart[id]; updateCartUI(); }
+
+        // --- MODALES ---
+        function openModal(id) { document.getElementById(id).style.display = 'block'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        function toggleCart() { document.getElementById('cart-panel').classList.toggle('active'); }
+
+        renderStore();
+    </script>
+</body>
+</html>

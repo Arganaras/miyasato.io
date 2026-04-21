@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tienda Oficial | Dojo Miyazato</title>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --negro: #0a0a0a;
+            --rojo: #bc002d;
+            --blanco: #f4f4f4;
+            --gris-oscuro: #1a1a1a;
+            --gris-claro: #333;
+            --admin-gold: #d4af37;
+            --exito: #28a745;
+            --transicion: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Roboto', sans-serif; background-color: var(--negro); color: var(--blanco); overflow-x: hidden; }
+        h1, h2, h3 { font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: 2px; }
+
+        /* --- NAVEGACIÓN --- */
+        header {
+            background-color: rgba(10, 10, 10, 0.98);
+            padding: 1rem 5%;
+            position: fixed; width: 100%; top: 0; z-index: 1000;
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 2px solid var(--rojo);
+        }
+        .logo { font-size: 1.6rem; font-weight: bold; text-decoration: none; color: white; }
+        .logo span { color: var(--rojo); }
+        nav ul { display: flex; gap: 20px; list-style: none; }
+        nav ul li a { text-decoration: none; color: white; font-size: 0.9rem; transition: var(--transicion); }
+        nav ul li a:hover { color: var(--rojo); }
+
+        .btn-nav { background: transparent; border: 1px solid white; color: white; padding: 6px 15px; cursor: pointer; font-size: 0.8rem; font-weight: bold; transition: var(--transicion); }
+        .btn-nav.red { background: var(--rojo); border-color: var(--rojo); }
+        .btn-nav:hover { background: white; color: black; }
+
+        /* --- LAYOUT TIENDA --- */
+        .container { max-width: 1200px; margin: 120px auto 60px; padding: 0 20px; }
+        
+        .shop-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; flex-wrap: wrap; gap: 20px; }
+        .search-box { flex-grow: 1; max-width: 500px; position: relative; }
+        .search-box input { width: 100%; padding: 12px 20px; background: var(--gris-oscuro); border: 1px solid var(--gris-claro); color: white; border-radius: 5px; outline: none; }
+        .search-box input:focus { border-color: var(--rojo); }
+        
+        /* --- PANEL ADMIN --- */
+        #admin-panel { 
+            display: none; background: #151515; border: 2px dashed var(--admin-gold); 
+            padding: 30px; margin-bottom: 40px; border-radius: 10px;
+        }
+        .admin-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 15px; }
+        .admin-grid input, .admin-grid select { padding: 10px; background: #222; border: 1px solid #444; color: white; }
+
+        /* --- GRID DE PRODUCTOS --- */
+        .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; }
+        
+        .card { 
+            background: var(--gris-oscuro); border-radius: 8px; overflow: hidden; 
+            transition: var(--transicion); position: relative; border: 1px solid #222;
+        }
+        .card:hover { transform: translateY(-10px); border-color: var(--rojo); box-shadow: 0 10px 20px rgba(188, 0, 45, 0.2); }
+        
+        .card-img-container { width: 100%; height: 250px; background: white; padding: 20px; position: relative; }
+        .card-img-container img { width: 100%; height: 100%; object-fit: contain; }
+        
+        .badge-category { 
+            position: absolute; top: 10px; left: 10px; background: var(--rojo); 
+            color: white; padding: 4px 10px; font-size: 0.7rem; font-weight: bold; text-transform: uppercase;
+        }
+
+        .card-info { padding: 20px; text-align: center; }
+        .card-title { font-size: 1.2rem; margin-bottom: 10px; color: var(--blanco); }
+        .card-price { font-size: 1.5rem; color: var(--rojo); font-weight: bold; margin-bottom: 15px; }
+        
+        /* --- CARRITO LATERAL --- */
+        #cart-sidebar {
+            position: fixed; right: -100%; top: 0; width: 400px; height: 100%;
+            background: var(--gris-oscuro); z-index: 2000; transition: 0.4s ease;
+            box-shadow: -5px 0 25px rgba(0,0,0,0.8); display: flex; flex-direction: column;
+        }
+        #cart-sidebar.active { right: 0; }
+        .cart-header { padding: 25px; background: var(--negro); border-bottom: 2px solid var(--rojo); display: flex; justify-content: space-between; align-items: center; }
+        .cart-items-container { flex-grow: 1; overflow-y: auto; padding: 20px; }
+        .cart-footer { padding: 25px; background: var(--negro); border-top: 1px solid var(--gris-claro); }
+        
+        .cart-item { 
+            display: flex; gap: 15px; align-items: center; margin-bottom: 20px; 
+            background: #222; padding: 10px; border-radius: 5px;
+        }
+        .cart-item img { width: 60px; height: 60px; object-fit: cover; background: white; border-radius: 4px; }
+        .cart-item-info { flex-grow: 1; }
+        .cart-qty-controls { display: flex; align-items: center; gap: 10px; margin-top: 5px; }
+        
+        /* --- BOTONES --- */
+        .btn { padding: 12px 20px; border: none; cursor: pointer; font-weight: bold; text-transform: uppercase; transition: var(--transicion); }
+        .btn-add { background: var(--rojo); color: white; width: 100%; }
+        .btn-add:hover { background: white; color: var(--rojo); }
+        .btn-admin { background: var(--admin-gold); color: black; }
+        .btn-qty { background: #444; color: white; width: 25px; height: 25px; display: flex; justify-content: center; align-items: center; border-radius: 50%; border: none; cursor: pointer; }
+        .btn-checkout { background: var(--exito); color: white; width: 100%; margin-top: 10px; font-size: 1.1rem; }
+
+        /* --- ALERTAS --- */
+        #custom-alert { 
+            display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+            z-index: 4000; background: var(--gris-oscuro); border: 2px solid var(--rojo); 
+            padding: 30px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 0 100px rgba(0,0,0,1);
+        }
+
+        .toast-msg {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            background: var(--exito); color: white; padding: 10px 30px; border-radius: 30px; z-index: 3000;
+            display: none; animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp { from { bottom: -50px; opacity: 0; } to { bottom: 20px; opacity: 1; } }
+
+        @media (max-width: 500px) {
+            #cart-sidebar { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="toast" class="toast-msg">¡Añadido al carrito!</div>
+
+    <div id="custom-alert">
+        <h3 id="alert-title">MENSAJE</h3>
+        <p id="alert-msg" style="margin: 20px 0;"></p>
+        <button class="btn btn-add" onclick="closeAlert()">ENTENDIDO</button>
+    </div>
+
+    <header>
+        <a href="menu.html" class="logo">DOJO <span>MIYAZATO</span></a>
+        <nav>
+            <ul>
+                <li><a href="menu.html">Inicio</a></li>
+                <li><a href="historia.html">Historia</a></li>
+                <li><a href="clases.html">Clases</a></li>
+                <li><a href="tienda.html" style="color: var(--rojo);">Tienda</a></li>
+            </ul>
+        </nav>
+        
+        <div style="display: flex; gap: 15px; align-items: center;">
+            <div id="guest-zone" style="display: flex; gap: 10px;">
+                <button class="btn-nav" onclick="window.location.href='init.html'">LOGIN</button>
+                <button class="btn-nav red" onclick="window.location.href='reg.html'">REGISTRO</button>
+            </div>
+
+            <div id="user-zone" style="display: none; align-items: center; gap: 15px;">
+                <span id="user-badge" style="color: var(--admin-gold); font-size: 0.8rem; font-weight: bold;"></span>
+                <button class="btn-nav" onclick="handleLogout()" style="border: 1px solid var(--rojo); color: var(--rojo);">SALIR</button>
+            </div>
+
+            <div onclick="toggleCart()" style="cursor:pointer; background: var(--rojo); padding: 8px 15px; border-radius: 5px; font-weight: bold;">
+                🛒 <span id="cart-count">0</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="shop-header">
+            <h2 style="font-size: 2.5rem;">Tienda <span style="color: var(--rojo);">Oficial</span></h2>
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="¿Qué estás buscando?" onkeyup="filterProducts()">
+            </div>
+        </div>
+
+        <div id="admin-panel">
+            <h3 style="color: var(--admin-gold);">🛡️ Panel Administrativo</h3>
+            <div class="admin-grid">
+                <input type="text" id="p-name" placeholder="Nombre">
+                <input type="number" id="p-price" placeholder="Precio ($)">
+                <select id="p-cat">
+                    <option value="Equipamiento">Equipamiento</option>
+                    <option value="Indumentaria">Indumentaria</option>
+                    <option value="Accesorios">Accesorios</option>
+                </select>
+                <input type="text" id="p-img" placeholder="URL de Imagen">
+                <button class="btn btn-admin" onclick="createNewProduct()">GUARDAR PRODUCTO</button>
+            </div>
+        </div>
+
+        <div style="margin-bottom: 30px; display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px;">
+            <button class="btn" onclick="filterByCat('todos')" style="background: #222; color: white;">Todos</button>
+            <button class="btn" onclick="filterByCat('Equipamiento')" style="background: #222; color: white;">Equipamiento</button>
+            <button class="btn" onclick="filterByCat('Indumentaria')" style="background: #222; color: white;">Indumentaria</button>
+            <button class="btn" onclick="filterByCat('Accesorios')" style="background: #222; color: white;">Accesorios</button>
+        </div>
+
+        <div class="products-grid" id="main-grid"></div>
+    </main>
+
+    <aside id="cart-sidebar">
+        <div class="cart-header">
+            <h3>Mi Carrito</h3>
+            <span style="cursor:pointer; font-size: 1.5rem;" onclick="toggleCart()">&times;</span>
+        </div>
+        <div class="cart-items-container" id="cart-list"></div>
+        <div class="cart-footer">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 20px; font-size: 1.3rem; font-weight: bold;">
+                <span>TOTAL:</span>
+                <span id="total-final" style="color: var(--rojo);">$0.00</span>
+            </div>
+            <button class="btn btn-checkout" onclick="processOrder()">FINALIZAR COMPRA</button>
+        </div>
+    </aside>
+
+    <script>
+        // --- DATA INICIAL ---
+        let products = JSON.parse(localStorage.getItem('miyazato_products')) || [
+            { id: 1, name: "Karategui Miyazato", price: 110, cat: "Indumentaria", img: "https://m.media-amazon.com/images/I/51r-H1LhG4L._AC_SL1000_.jpg" },
+            { id: 2, name: "Protector Tibial", price: 55, cat: "Equipamiento", img: "https://m.media-amazon.com/images/I/61N+Vp0P3SL._AC_SL1200_.jpg" },
+            { id: 3, name: "Guantines Karate", price: 45, cat: "Equipamiento", img: "https://m.media-amazon.com/images/I/41Dq78m481L._AC_.jpg" }
+        ];
+
+        let cart = JSON.parse(localStorage.getItem('miyazato_cart')) || {};
+        const currentUser = JSON.parse(localStorage.getItem('miyazato_user'));
+
+        window.onload = () => {
+            checkUser();
+            renderStore(products);
+            updateCartUI();
+        };
+
+        function checkUser() {
+            const gz = document.getElementById('guest-zone');
+            const uz = document.getElementById('user-zone');
+            if(currentUser) {
+                gz.style.display = 'none';
+                uz.style.display = 'flex';
+                document.getElementById('user-badge').innerText = `HOLA, ${currentUser.user.toUpperCase()}`;
+                if(currentUser.role === 'admin') document.getElementById('admin-panel').style.display = 'block';
+            }
+        }
+
+        function handleLogout() {
+            localStorage.removeItem('miyazato_user');
+            window.location.reload();
+        }
+
+        function renderStore(data) {
+            const grid = document.getElementById('main-grid');
+            grid.innerHTML = '';
+            data.forEach(p => {
+                grid.innerHTML += `
+                    <div class="card">
+                        <div class="card-img-container">
+                            <span class="badge-category">${p.cat}</span>
+                            <img src="${p.img}" onerror="this.src='https://via.placeholder.com/200?text=No+Image'">
+                        </div>
+                        <div class="card-info">
+                            <h3 class="card-title">${p.name}</h3>
+                            <p class="card-price">$${p.price.toFixed(2)}</p>
+                            <button class="btn btn-add" onclick="addToCart(${p.id})">AÑADIR AL CARRITO</button>
+                            ${currentUser?.role === 'admin' ? `<button onclick="deleteProduct(${p.id})" style="margin-top:10px; color:gray; background:none; border:none; cursor:pointer; font-size:0.7rem;">[ELIMINAR PRODUCTO]</button>` : ''}
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function addToCart(id) {
+            const p = products.find(x => x.id === id);
+            if(cart[id]) cart[id].qty++;
+            else cart[id] = { ...p, qty: 1 };
+            saveCart();
+            updateCartUI();
+            showToast();
+        }
+
+        function changeQty(id, delta) {
+            cart[id].qty += delta;
+            if(cart[id].qty <= 0) delete cart[id];
+            saveCart();
+            updateCartUI();
+        }
+
+        function updateCartUI() {
+            const list = document.getElementById('cart-list');
+            let total = 0, count = 0;
+            list.innerHTML = '';
+            Object.values(cart).forEach(item => {
+                count += item.qty;
+                total += item.price * item.qty;
+                list.innerHTML += `
+                    <div class="cart-item">
+                        <img src="${item.img}">
+                        <div class="cart-item-info">
+                            <div style="font-weight:bold; font-size:0.9rem;">${item.name}</div>
+                            <div style="color:var(--rojo); font-size:0.85rem;">$${(item.price * item.qty).toFixed(2)}</div>
+                            <div class="cart-qty-controls">
+                                <button class="btn-qty" onclick="changeQty(${item.id}, -1)">-</button>
+                                <span>${item.qty}</span>
+                                <button class="btn-qty" onclick="changeQty(${item.id}, 1)">+</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            document.getElementById('cart-count').innerText = count;
+            document.getElementById('total-final').innerText = `$${total.toFixed(2)}`;
+        }
+
+        // --- LÓGICA DE COMPRA Y RECIBO ---
+        function processOrder() {
+            if(!currentUser) return showAlert("IDENTIFICACIÓN", "Debes iniciar sesión para finalizar la compra.");
+            if(Object.keys(cart).length === 0) return showAlert("CARRITO VACÍO", "No hay productos para procesar.");
+            
+            // 1. Generar contenido del recibo
+            const ticket = generateTicketText();
+            
+            // 2. Descargar archivo
+            downloadReceipt(ticket);
+
+            // 3. Limpiar y avisar
+            showAlert("¡COMPRA EXITOSA!", `Gracias ${currentUser.user.toUpperCase()}. Se ha descargado tu recibo oficial.`);
+            cart = {};
+            saveCart();
+            updateCartUI();
+            if(document.getElementById('cart-sidebar').classList.contains('active')) toggleCart();
+        }
+
+        function generateTicketText() {
+            const date = new Date().toLocaleString();
+            let total = 0;
+            let itemsText = "";
+
+            Object.values(cart).forEach(item => {
+                const sub = item.price * item.qty;
+                total += sub;
+                itemsText += `- ${item.name.padEnd(25)} x${item.qty}   $${sub.toFixed(2)}\n`;
+            });
+
+            return `
+========================================
+       DOJO MIYAZATO - RECIBO OFICIAL
+========================================
+FECHA: ${date}
+CLIENTE: ${currentUser.user.toUpperCase()}
+EMAIL: ${currentUser.email || 'N/A'}
+----------------------------------------
+DETALLE DE PRODUCTOS:
+${itemsText}
+----------------------------------------
+TOTAL FINAL: $${total.toFixed(2)}
+----------------------------------------
+¡Gracias por confiar en nuestra escuela!
+KARATE-DO MIYAZATO - TRADICIÓN Y HONOR
+========================================
+            `;
+        }
+
+        function downloadReceipt(text) {
+            const blob = new Blob([text], {type: 'text/plain'});
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `Recibo_Miyazato_${Date.now()}.txt`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // --- FUNCIONES ADMIN Y FILTROS ---
+        function createNewProduct() {
+            const name = document.getElementById('p-name').value;
+            const price = parseFloat(document.getElementById('p-price').value);
+            const cat = document.getElementById('p-cat').value;
+            const img = document.getElementById('p-img').value;
+            if(!name || !price) return showAlert("ERROR", "Nombre y precio son obligatorios.");
+            products.push({ id: Date.now(), name, price, cat, img });
+            localStorage.setItem('miyazato_products', JSON.stringify(products));
+            renderStore(products);
+            showAlert("ADMIN", "Producto añadido correctamente.");
+        }
+
+        function deleteProduct(id) {
+            products = products.filter(x => x.id !== id);
+            localStorage.setItem('miyazato_products', JSON.stringify(products));
+            renderStore(products);
+        }
+
+        function filterProducts() {
+            const term = document.getElementById('searchInput').value.toLowerCase();
+            renderStore(products.filter(p => p.name.toLowerCase().includes(term)));
+        }
+
+        function filterByCat(cat) {
+            if(cat === 'todos') renderStore(products);
+            else renderStore(products.filter(p => p.cat === cat));
+        }
+
+        function saveCart() { localStorage.setItem('miyazato_cart', JSON.stringify(cart)); }
+        function toggleCart() { document.getElementById('cart-sidebar').classList.toggle('active'); }
+        function showToast() { 
+            const t = document.getElementById('toast'); 
+            t.style.display = 'block'; 
+            setTimeout(() => t.style.display='none', 2000); 
+        }
+        function showAlert(t, m) {
+            document.getElementById('alert-title').innerText = t;
+            document.getElementById('alert-msg').innerText = m;
+            document.getElementById('custom-alert').style.display = 'block';
+        }
+        function closeAlert() { document.getElementById('custom-alert').style.display = 'none'; }
+    </script>
+</body>
+</html>

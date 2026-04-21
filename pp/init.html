@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro Oficial | Dojo Miyazato</title>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --rojo: #bc002d;
+            --negro: #000000;
+            --blanco: #ffffff;
+            --gris-texto: #888888;
+            --exito: #00ff88;
+            --transicion: all 0.3s ease;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--negro);
+            color: var(--blanco);
+            font-family: 'Roboto', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-image: radial-gradient(circle at center, #1a1a1a 0%, #000000 100%);
+            padding: 20px;
+        }
+
+        .btn-volver {
+            position: absolute; top: 20px; left: 20px;
+            color: white; text-decoration: none; border: 1px solid white;
+            padding: 8px 15px; font-family: 'Oswald'; font-size: 0.8rem;
+            transition: var(--transicion);
+        }
+        .btn-volver:hover { background: white; color: black; }
+
+        .reg-card {
+            background-color: var(--rojo);
+            padding: 40px;
+            width: 100%;
+            max-width: 480px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.8);
+            border: 2px solid rgba(255,255,255,0.1);
+        }
+
+        h2 {
+            font-family: 'Oswald';
+            font-size: 2.2rem;
+            text-align: center;
+            margin-bottom: 25px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .form-group { margin-bottom: 15px; position: relative; }
+        label { 
+            display: block; font-size: 0.7rem; font-weight: bold; 
+            text-transform: uppercase; margin-bottom: 5px; color: rgba(255,255,255,0.9);
+        }
+
+        input {
+            width: 100%; padding: 12px; border: none; border-radius: 3px;
+            font-size: 1rem; color: #333; outline: none;
+        }
+
+        /* --- MOSTRAR CONTRASEÑA --- */
+        .pass-wrapper { position: relative; display: flex; align-items: center; }
+        .toggle-pass {
+            position: absolute; right: 10px; color: #333;
+            cursor: pointer; font-size: 0.8rem; font-weight: bold;
+            user-select: none; background: #ddd; padding: 2px 6px; border-radius: 3px;
+        }
+
+        /* --- VALIDACIONES EN TIEMPO REAL --- */
+        .validator-ui {
+            background: rgba(0,0,0,0.2);
+            padding: 12px;
+            margin-top: 8px;
+            border-radius: 4px;
+        }
+        .condition {
+            font-size: 0.75rem;
+            color: var(--gris-texto); /* Color inicial gris */
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 4px;
+            transition: var(--transicion);
+        }
+        .condition.met {
+            color: var(--exito); /* Cambia al toque a verde */
+            font-weight: bold;
+        }
+        .condition i { font-style: normal; }
+
+        /* --- CAPTCHA --- */
+        .captcha-container {
+            background: rgba(0,0,0,0.3);
+            padding: 15px; margin: 20px 0;
+            border-radius: 5px; display: flex;
+            align-items: center; justify-content: space-between;
+        }
+        .captcha-question { font-family: 'Oswald'; font-size: 1.1rem; }
+        .captcha-input { width: 70px !important; text-align: center; }
+
+        .btn-submit {
+            width: 100%; padding: 15px; background: var(--negro);
+            color: white; border: none; font-family: 'Oswald';
+            font-size: 1.3rem; cursor: pointer; transition: var(--transicion);
+            text-transform: uppercase; letter-spacing: 2px;
+        }
+        .btn-submit:hover { background: white; color: var(--negro); }
+
+        /* ALERTAS */
+        #alert-box {
+            display: none; position: fixed; top: 20px; right: 20px;
+            background: white; color: black; padding: 20px;
+            border-left: 5px solid var(--rojo); z-index: 10000;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); width: 300px;
+        }
+    </style>
+</head>
+<body>
+
+    <a href="menu.html" class="btn-volver">VOLVER AL MENU</a>
+
+    <div id="alert-box">
+        <strong id="alert-title">SISTEMA</strong>
+        <p id="alert-msg"></p>
+    </div>
+
+    <div class="reg-card">
+        <h2>Registro Miyazato</h2>
+        
+        <div class="form-group">
+            <label>Nombre de Usuario</label>
+            <input type="text" id="u" placeholder="Ej: Kenji88">
+        </div>
+
+        <div class="form-group">
+            <label>Correo Electrónico (@gmail.com)</label>
+            <input type="email" id="e" placeholder="correo@gmail.com">
+        </div>
+
+        <div class="form-group">
+            <label>Contraseña</label>
+            <div class="pass-wrapper">
+                <input type="password" id="p" placeholder="••••••••" onkeyup="checkPasswordLive()">
+                <span class="toggle-pass" onclick="togglePass('p')">VER</span>
+            </div>
+            
+            <div class="validator-ui">
+                <div id="len" class="condition"><i>○</i> Mínimo 8 caracteres</div>
+                <div id="caps" class="condition"><i>○</i> Mayúscula y Minúscula</div>
+                <div id="num" class="condition"><i>○</i> Un número</div>
+                <div id="sym" class="condition"><i>○</i> Un símbolo (!@#$)</div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Confirmar Contraseña</label>
+            <div class="pass-wrapper">
+                <input type="password" id="cp" placeholder="••••••••">
+                <span class="toggle-pass" onclick="togglePass('cp')">VER</span>
+            </div>
+        </div>
+
+        <div class="captcha-container">
+            <div class="captcha-question">¿Cuánto es <span id="n1">0</span> + <span id="n2">0</span>?</div>
+            <input type="number" id="captcha-ans" class="captcha-input">
+        </div>
+
+        <button class="btn-submit" onclick="validateRegistration()">REGISTRAR MIEMBRO</button>
+    </div>
+
+    <script>
+        let db = JSON.parse(localStorage.getItem('miyazato_database')) || [];
+        let sol = 0;
+
+        function genCaptcha() {
+            const a = Math.floor(Math.random() * 9) + 1;
+            const b = Math.floor(Math.random() * 9) + 1;
+            document.getElementById('n1').innerText = a;
+            document.getElementById('n2').innerText = b;
+            sol = a + b;
+        }
+
+        window.onload = genCaptcha;
+
+        // --- MOSTRAR / OCULTAR CONTRASEÑA ---
+        function togglePass(id) {
+            const input = document.getElementById(id);
+            const btn = input.nextElementSibling;
+            if (input.type === "password") {
+                input.type = "text";
+                btn.innerText = "OCULTAR";
+            } else {
+                input.type = "password";
+                btn.innerText = "VER";
+            }
+        }
+
+        // --- VALIDACIÓN EN TIEMPO REAL AL ESCRIBIR ---
+        function checkPasswordLive() {
+            const val = document.getElementById('p').value;
+            
+            const rules = {
+                len: val.length >= 8,
+                caps: /[A-Z]/.test(val) && /[a-z]/.test(val),
+                num: /[0-9]/.test(val),
+                sym: /[!@#$%^&*]/.test(val)
+            };
+
+            for (const [id, met] of Object.entries(rules)) {
+                const el = document.getElementById(id);
+                if (met) {
+                    el.classList.add('met');
+                    el.querySelector('i').innerText = '●';
+                } else {
+                    el.classList.remove('met');
+                    el.querySelector('i').innerText = '○';
+                }
+            }
+        }
+
+        function validateRegistration() {
+            const user = document.getElementById('u').value.trim().toLowerCase();
+            const email = document.getElementById('e').value.trim().toLowerCase();
+            const pass = document.getElementById('p').value;
+            const cpass = document.getElementById('cp').value;
+            const captcha = parseInt(document.getElementById('captcha-ans').value);
+
+            if(!user || !email || !pass) return triggerAlert("Dojo Miyazato", "Completa todos los campos.");
+            
+            // Duplicados
+            if(db.find(x => x.user === user)) return triggerAlert("Usuario", "Este nombre ya existe.");
+            if(db.find(x => x.email === email)) return triggerAlert("Email", "Este correo ya está registrado.");
+
+            // Gmail check
+            if(!email.endsWith("@gmail.com")) return triggerAlert("Email", "Solo cuentas @gmail.com");
+
+            // Requisitos de clave final
+            const strong = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*]).{8,}$/;
+            if(!strong.test(pass)) return triggerAlert("Seguridad", "La clave no cumple los requisitos.");
+
+            if(pass !== cpass) return triggerAlert("Error", "Las contraseñas no coinciden.");
+
+            // Captcha check
+            if(captcha !== sol) {
+                triggerAlert("Captcha", "Suma incorrecta.");
+                genCaptcha();
+                return;
+            }
+
+            // Guardar
+            db.push({ user, email, pass, role: "user" });
+            localStorage.setItem('miyazato_database', JSON.stringify(db));
+
+            triggerAlert("ÉXITO", "Cuenta creada. Redirigiendo...");
+            setTimeout(() => { window.location.href = 'init.html'; }, 2000);
+        }
+
+        function triggerAlert(t, m) {
+            const box = document.getElementById('alert-box');
+            document.getElementById('alert-title').innerText = t;
+            document.getElementById('alert-msg').innerText = m;
+            box.style.display = 'block';
+            setTimeout(() => { box.style.display = 'none'; }, 3000);
+        }
+    </script>
+</body>
+</html>

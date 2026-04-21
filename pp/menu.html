@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dojo Miyazato | Menú Principal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --negro: #0a0a0a;
+            --rojo: #bc002d;
+            --blanco: #f4f4f4;
+            --gris-oscuro: #1a1a1a;
+            --admin-gold: #d4af37;
+            --transicion: all 0.3s ease;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Roboto', sans-serif; background-color: var(--negro); color: var(--blanco); line-height: 1.6; overflow-x: hidden; }
+        h1, h2, h3 { font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: 2px; }
+        ul { list-style: none; }
+        a { text-decoration: none; color: inherit; }
+
+        /* --- BIENVENIDA ANIMADA --- */
+        #welcome-screen { 
+            display: none; position: fixed; top:0; left:0; width:100%; height:100%; 
+            background: var(--negro); z-index: 5000; flex-direction: column; 
+            justify-content: center; align-items: center; 
+        }
+        .welcome-text { font-family: 'Oswald'; font-size: 4rem; color: var(--rojo); animation: zoomIn 1.5s ease-out; text-align: center; }
+        @keyframes zoomIn { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+        /* --- ALERTA PERSONALIZADA --- */
+        #custom-alert { 
+            display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+            z-index: 4000; background: var(--gris-oscuro); border: 2px solid var(--rojo); 
+            padding: 30px; width: 90%; max-width: 400px; text-align: center; 
+            box-shadow: 0 0 50px rgba(0,0,0,1);
+        }
+        .suggestion-chip { 
+            display: inline-block; background: #333; padding: 5px 12px; margin: 5px; 
+            cursor: pointer; border-radius: 20px; font-size: 0.8rem; border: 1px solid var(--rojo); 
+        }
+        .suggestion-chip:hover { background: var(--rojo); }
+
+        /* --- NAVEGACIÓN --- */
+        header {
+            background-color: rgba(10, 10, 10, 0.98);
+            padding: 1rem 5%;
+            position: fixed; width: 100%; top: 0; z-index: 1000;
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 2px solid var(--rojo);
+        }
+        .logo { font-size: 1.6rem; font-weight: bold; }
+        .logo span { color: var(--rojo); }
+        .nav-wrapper { display: flex; align-items: center; gap: 20px; }
+        nav ul { display: flex; gap: 20px; }
+        nav ul li a:hover { color: var(--rojo); cursor: pointer; }
+        
+        .btn-nav { background: transparent; border: 1px solid white; color: white; padding: 6px 12px; cursor: pointer; font-size: 0.8rem; }
+        .btn-nav.red { background: var(--rojo); border-color: var(--rojo); }
+        .btn-nav.user-btn { border-color: var(--admin-gold); color: var(--admin-gold); }
+
+        /* --- SECCIÓN INICIO (HERO) --- */
+        #inicio {
+            height: 100vh;
+            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1555597673-b21d5c935865?auto=format&fit=crop&w=1350&q=80');
+            background-size: cover; background-position: center;
+            display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;
+            padding: 0 10%;
+        }
+
+        /* --- BOTONES Y MODALES --- */
+        .btn-main { background: var(--rojo); color: white; border: none; padding: 12px 25px; cursor: pointer; font-weight: bold; transition: var(--transicion); }
+        .btn-main:hover { background: white; color: var(--negro); }
+
+        .modal { display: none; position: fixed; z-index: 3000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); }
+        .modal-content { background: var(--gris-oscuro); margin: 5% auto; padding: 40px; width: 90%; max-width: 500px; border: 1px solid var(--rojo); position: relative; }
+        .close { position: absolute; right: 20px; top: 10px; font-size: 2rem; cursor: pointer; }
+        input { width: 100%; padding: 12px; margin: 10px 0; background: #222; border: 1px solid #444; color: white; }
+
+        #cart-panel {
+            position: fixed; right: -450px; top: 0; width: 420px; height: 100%;
+            background: var(--gris-oscuro); z-index: 2500; padding: 30px; transition: 0.5s;
+            box-shadow: -10px 0 30px rgba(0,0,0,0.8);
+        }
+        #cart-panel.active { right: 0; }
+    </style>
+</head>
+<body>
+
+    <div id="welcome-screen">
+        <div class="welcome-text" id="welcome-user-text">BIENVENIDO</div>
+        <p style="letter-spacing: 5px; color: white;">DOJO MIYAZATO</p>
+    </div>
+
+    <div id="custom-alert">
+        <h3 id="alert-title">AVISO</h3>
+        <p id="alert-msg"></p>
+        <div id="user-suggestions"></div>
+        <button class="btn-main" onclick="closeAlert()">ENTENDIDO</button>
+    </div>
+
+    <header>
+        <div class="logo">DOJO <span>MIYAZATO</span></div>
+        <div class="nav-wrapper">
+            <nav>
+                <ul>
+                    <li><a href="menu.html">Inicio</a></li>
+                    <li><a href="historia.html">El Dojo</a></li>
+                    <li><a href="clases.html">Clases</a></li>
+                    <li><a href="tienda.html">Tienda</a></li>
+                </ul>
+            </nav>
+            <div id="guest-zone">
+                <button class="btn-nav" onclick="openModal('loginModal')">LOGIN</button>
+                <button class="btn-nav red" onclick="openModal('regModal')">REGISTRO</button>
+            </div>
+            <div id="user-zone" style="display: none;">
+                <button class="btn-nav user-btn" onclick="openModal('perfilModal')">MIS DATOS</button>
+            </div>
+            <div onclick="toggleCart()" style="cursor:pointer; background: var(--rojo); padding: 5px 12px; border-radius: 4px;">
+                🛒 (<span id="cart-count">0</span>)
+            </div>
+        </div>
+    </header>
+
+    <section id="inicio">
+        <h1 style="font-size: 4rem; margin-bottom: 20px;">Bienvenido a Miyazato Dojo</h1>
+        <p style="font-size: 1.2rem; max-width: 800px; margin-bottom: 30px;">
+            Miyazato Dojo es sinónimo de tradición marcial. Heredera de siglos de evolución en el arte del Karate-Do ofrece, desde hace cincuenta y cinco años en Argentina, un método seguro y eficaz.
+        </p>
+        <a href="clases.html" class="btn-main" style="text-decoration: none;">EMPEZAR A ENTRENAR</a>
+    </section>
+
+    <div id="regModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('regModal')">&times;</span>
+            <h2>Registro</h2>
+            <input type="email" id="reg-email" placeholder="Correo (Gmail)">
+            <input type="text" id="reg-user" placeholder="Usuario">
+            <input type="password" id="reg-pass" placeholder="Contraseña">
+            <p style="font-size: 0.7rem; color: #888;">* 8 chars, 1 Mayus, 1 Minus, 1 Signo</p>
+            <input type="password" id="reg-confirm" placeholder="Confirmar">
+            <div style="display:flex; gap:10px; margin:10px 0;">
+                <input type="checkbox" id="reg-robot" style="width:auto;"> <label>No soy un robot</label>
+            </div>
+            <button class="btn-main" style="width:100%" onclick="handleRegister()">CREAR CUENTA</button>
+        </div>
+    </div>
+
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('loginModal')">&times;</span>
+            <h2>Ingreso</h2>
+            <input type="text" id="login-user" placeholder="Usuario">
+            <input type="password" id="login-pass" placeholder="Contraseña">
+            <button class="btn-main" style="width:100%" onclick="handleLogin()">INICIAR SESIÓN</button>
+        </div>
+    </div>
+
+    <div id="perfilModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('perfilModal')">&times;</span>
+            <h2 id="perf-name">Usuario</h2>
+            <p id="perf-email"></p>
+            <button class="btn-main" style="background:#444; margin-top:20px; width:100%" onclick="handleLogout()">CERRAR SESIÓN</button>
+        </div>
+    </div>
+
+    <div id="cart-panel">
+        <h2>CARRITO</h2>
+        <div id="cart-items" style="margin:20px 0; min-height: 200px; border-bottom: 1px solid #333;"></div>
+        <button class="btn-main" style="width:100%" onclick="toggleCart()">CERRAR</button>
+    </div>
+
+<script>
+    // --- LOGICA GLOBAL ---
+    let registeredUsers = JSON.parse(localStorage.getItem('miyazato_database')) || [
+        { user: "administrador", pass: "Admin123!", email: "admin@gmail.com", role: "admin" }
+    ];
+    let currentUser = JSON.parse(localStorage.getItem('miyazato_user')) || null;
+
+    function sync() {
+        localStorage.setItem('miyazato_database', JSON.stringify(registeredUsers));
+        localStorage.setItem('miyazato_user', JSON.stringify(currentUser));
+    }
+
+    // --- ALERTAS ---
+    function showAlert(title, msg, sugs = []) {
+        document.getElementById('alert-title').innerText = title;
+        document.getElementById('alert-msg').innerText = msg;
+        const sBox = document.getElementById('user-suggestions');
+        sBox.innerHTML = '';
+        sugs.forEach(s => sBox.innerHTML += `<span class="suggestion-chip" onclick="document.getElementById('reg-user').value='${s}'; closeAlert()">${s}</span>`);
+        document.getElementById('custom-alert').style.display = 'block';
+    }
+    function closeAlert() { document.getElementById('custom-alert').style.display = 'none'; }
+
+    // --- BIENVENIDA ---
+    function showWelcome(name) {
+        const screen = document.getElementById('welcome-screen');
+        document.getElementById('welcome-user-text').innerText = "BIENVENIDO " + name.toUpperCase();
+        screen.style.display = 'flex';
+        setTimeout(() => {
+            screen.style.opacity = '0';
+            setTimeout(() => { 
+                screen.style.display = 'none'; 
+                screen.style.opacity = '1';
+                updateUI();
+            }, 500);
+        }, 2000);
+    }
+
+    // --- REGISTRO Y LOGIN ---
+    function handleRegister() {
+        const u = document.getElementById('reg-user').value.toLowerCase();
+        const e = document.getElementById('reg-email').value;
+        const p = document.getElementById('reg-pass').value;
+        const pc = document.getElementById('reg-confirm').value;
+        const robot = document.getElementById('reg-robot').checked;
+
+        if(!u || !e || !p) return showAlert("ERROR", "Completa todo.");
+        if(registeredUsers.find(x => x.user === u)) return showAlert("EN USO", "Prueba con:", [u+"2026", u+"_dojo", "karate."+u]);
+        if(!/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*()]).{8,}$/.test(p)) return showAlert("DEBIL", "La clave no cumple requisitos.");
+        if(p !== pc) return showAlert("ERROR", "Claves no coinciden.");
+        if(!robot) return showAlert("ROBOT", "Marca la casilla.");
+
+        registeredUsers.push({ user: u, pass: p, email: e, role: "user" });
+        sync();
+        showAlert("EXITO", "Ya puedes loguearte.");
+        closeModal('regModal');
+    }
+
+    function handleLogin() {
+        const u = document.getElementById('login-user').value.toLowerCase();
+        const p = document.getElementById('login-pass').value;
+        const found = registeredUsers.find(x => x.user === u && x.pass === p);
+        if(found) {
+            currentUser = found;
+            sync();
+            closeModal('loginModal');
+            showWelcome(found.user);
+        } else {
+            showAlert("ERROR", "Usuario o clave incorrectos.");
+        }
+    }
+
+    function updateUI() {
+        if(currentUser) {
+            document.getElementById('guest-zone').style.display = 'none';
+            document.getElementById('user-zone').style.display = 'block';
+            document.getElementById('perf-name').innerText = currentUser.user;
+            document.getElementById('perf-email').innerText = currentUser.email;
+        }
+    }
+
+    function handleLogout() { currentUser = null; sync(); location.reload(); }
+    function openModal(id) { document.getElementById(id).style.display = 'block'; }
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+    function toggleCart() { document.getElementById('cart-panel').classList.toggle('active'); }
+
+    // Al cargar
+    updateUI();
+</script>
+</body>
+</html>
